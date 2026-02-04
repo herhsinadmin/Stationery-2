@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文具申請單</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f0f7ff; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { color: #4a90e2; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #555; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #4a90e2; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+        button:hover { background-color: #357abd; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>文具申請系統</h2>
+    <div class="form-group">
+        <label>姓名</label>
+        <input type="text" id="name" placeholder="請輸入姓名">
+    </div>
+    <div class="form-group">
+        <label>部門</label>
+        <select id="dept">
+            <option value="行政部">行政部</option>
+            <option value="業務部">業務部</option>
+            <option value="工程部">工程部</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>要換什麼文具</label>
+        <input type="text" id="item" placeholder="例如：原子筆">
+    </div>
+    <div class="form-group">
+        <label>換幾個</label>
+        <input type="number" id="amount" value="1">
+    </div>
+    <button onclick="submitForm()">送出申請</button>
+</div>
+
+<script>
+    function submitForm() {
+        // 請將下方的網址替換成你剛剛部署的 GAS 網址
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbyTJQuADbl3q1ignU0l69qUvQn5UL9jDOiLYI0Dj-J1OCnkZ5vcyUYt1LClLhStw4UD/exec";
+        
+        const data = {
+            name: document.getElementById('name').value,
+            dept: document.getElementById('dept').value,
+            item: document.getElementById('item').value,
+            amount: document.getElementById('amount').value
+        };
+
+        fetch(scriptUrl, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(response => {
+            alert('申請成功！資料已飛進試算表囉。');
+        })
+        .catch(error => {
+            alert('連線失敗，請確認網址是否正確。');
+            console.error(error);
+        });
+    }
+</script>
+
+</body>
+</html>
