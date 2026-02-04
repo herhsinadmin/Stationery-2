@@ -3,202 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>文具申請系統</title>
+    <title>文具管理系統</title>
     <style>
-        /* --- 網頁視覺樣式 (螢幕顯示) --- */
-        body { 
-            font-family: "Microsoft JhengHei", sans-serif; 
-            background-color: #f0f7ff; /* 淡淡的藍色背景 */
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh;
-            margin: 0;
-        }
-
-        .card { 
-            background: white; 
-            padding: 30px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
-            width: 100%; 
-            max-width: 400px; 
-        }
-
-        h2 { color: #4a90e2; text-align: center; margin-bottom: 25px; }
-
-        .form-group { margin-bottom: 15px; }
+        body { font-family: "Microsoft JhengHei", sans-serif; background-color: #f0f7ff; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 100%; max-width: 500px; margin-bottom: 20px; }
+        h2 { color: #4a90e2; text-align: center; margin-top: 0; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn-group { display: flex; gap: 10px; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-add { background-color: #4a90e2; color: white; }
         
-        label { display: block; margin-bottom: 8px; color: #666; font-weight: bold; }
-        
-        input, select { 
-            width: 100%; 
-            padding: 12px; 
-            border: 1px solid #e1e8ed; 
-            border-radius: 10px; 
-            box-sizing: border-box; 
-            font-size: 16px;
-            outline: none;
-            transition: border 0.3s;
-        }
+        /* 紀錄列表樣式 */
+        .history-container { width: 100%; max-width: 800px; background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+        th { background-color: #f8fbff; color: #4a90e2; }
+        .btn-edit { background-color: #ffc107; color: black; padding: 5px 10px; font-size: 12px; }
+        .btn-del { background-color: #ff4d4d; color: white; padding: 5px 10px; font-size: 12px; }
 
-        input:focus { border-color: #4a90e2; }
-
-        button { 
-            width: 100%; 
-            padding: 15px; 
-            background-color: #4a90e2; 
-            color: white; 
-            border: none; 
-            border-radius: 10px; 
-            font-size: 18px; 
-            font-weight: bold;
-            cursor: pointer; 
-            margin-top: 10px;
-            transition: background 0.3s;
-        }
-
-        button:hover { background-color: #357abd; }
-
-        /* --- 列印專用樣式 --- */
+        @media print { .card, .history-container { display: none; } #printArea { display: block; } }
         #printArea { display: none; }
-
-        @media print {
-            body { background-color: white; }
-            .card { display: none; } /* 列印時隱藏輸入表單 */
-            
-            #printArea { 
-                display: block; 
-                width: 100%;
-                padding: 20px;
-                color: black;
-            }
-            .print-header { 
-                text-align: center; 
-                border-bottom: 2px solid #333; 
-                padding-bottom: 10px; 
-                margin-bottom: 20px;
-            }
-            .print-row { 
-                font-size: 18px; 
-                margin: 15px 0; 
-                display: flex;
-                justify-content: space-between;
-            }
-            .signature-box {
-                margin-top: 60px;
-                text-align: right;
-                font-size: 18px;
-            }
-        }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>文具申請單</h2>
-        
-        <div class="form-group">
-            <label>申請人姓名</label>
-            <input type="text" id="name" placeholder="請輸入姓名">
-        </div>
-
-        <div class="form-group">
-            <label>所屬部門</label>
-            <select id="dept">
-                <option value="行政部">行政部</option>
-                <option value="業務部">業務部</option>
-                <option value="工程部">工程部</option>
-                <option value="財務部">財務部</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>欲申請文具</label>
-            <input type="text" id="item" placeholder="例如：A4 影印紙">
-        </div>
-
-        <div class="form-group">
-            <label>申請數量</label>
-            <input type="number" id="amount" value="1" min="1">
-        </div>
-
-        <button onclick="submitForm()">送出並列印報表</button>
+<div class="card">
+    <h2 id="formTitle">新申請單</h2>
+    <input type="hidden" id="editIdx">
+    <div class="form-group"><label>姓名</label><input type="text" id="name"></div>
+    <div class="form-group">
+        <label>部門</label>
+        <select id="dept"><option>行政部</option><option>業務部</option><option>工程部</option></select>
     </div>
-
-    <div id="printArea">
-        <div class="print-header">
-            <h1>文具領用證明單</h1>
-        </div>
-        <div class="print-row"><span>申請日期：</span><span id="p-date"></span></div>
-        <div class="print-row"><span>申請人：</span><span id="p-name"></span></div>
-        <div class="print-row"><span>部門：</span><span id="p-dept"></span></div>
-        <div class="print-row"><span>申請項目：</span><span id="p-item"></span></div>
-        <div class="print-row"><span>數量：</span><span id="p-amount"></span></div>
-        
-        <div class="signature-box">
-            <p>部門主管簽章：____________________</p>
-            <p style="margin-top: 30px;">經手人簽章：____________________</p>
-        </div>
-        <p style="font-size: 12px; color: gray; text-align: center; margin-top: 50px;">此單據由系統自動產生</p>
+    <div class="form-group"><label>文具</label><input type="text" id="item"></div>
+    <div class="form-group"><label>數量</label><input type="number" id="amount" value="1"></div>
+    <div class="btn-group">
+        <button class="btn-add" onclick="submitForm()">送出申請</button>
+        <button id="cancelBtn" style="display:none;" onclick="resetForm()">取消編輯</button>
     </div>
+</div>
 
-    <script>
-        async function submitForm() {
-            // --- 重點：請在此處貼上你的 Google Apps Script 部署網址 ---
-            const scriptUrl = "你的_GOOGLE_SCRIPT_網址";
-            
-            const name = document.getElementById('name').value;
-            const dept = document.getElementById('dept').value;
-            const item = document.getElementById('item').value;
-            const amount = document.getElementById('amount').value;
+<div class="history-container">
+    <h2>最近申請紀錄</h2>
+    <table id="recordTable">
+        <thead><tr><th>姓名</th><th>項目</th><th>數量</th><th>操作</th></tr></thead>
+        <tbody></tbody>
+    </table>
+</div>
 
-            // 簡單檢查是否有填寫
-            if (!name || !item) {
-                alert("請填寫姓名與文具名稱喔！");
-                return;
-            }
+<script>
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbyTJQuADbl3q1ignU0l69qUvQn5UL9jDOiLYI0Dj-J1OCnkZ5vcyUYt1LClLhStw4UD/exec";
 
-            const data = { name, dept, item, amount };
+    // 初始化：讀取資料
+    window.onload = fetchRecords;
 
-            // 顯示傳送中狀態
-            const btn = document.querySelector('button');
-            btn.innerText = "傳送中...";
-            btn.disabled = true;
+    async function fetchRecords() {
+        const response = await fetch(scriptUrl);
+        const data = await response.json();
+        const tbody = document.querySelector('#recordTable tbody');
+        tbody.innerHTML = '';
+        data.reverse().forEach((row, index) => {
+            const actualIdx = data.length - index; // 對應試算表行數
+            tbody.innerHTML += `
+                <tr>
+                    <td>${row.name}</td>
+                    <td>${row.item}</td>
+                    <td>${row.amount}</td>
+                    <td>
+                        <button class="btn-edit" onclick="editMode(${actualIdx}, '${row.name}', '${row.dept}', '${row.item}', ${row.amount})">改</button>
+                        <button class="btn-del" onclick="deleteRecord(${actualIdx})">刪</button>
+                    </td>
+                </tr>`;
+        });
+    }
 
-            try {
-                // 使用 Google Apps Script 建議的傳送方式
-                await fetch(scriptUrl, {
-                    method: 'POST',
-                    mode: 'no-cors', // 解決 CORS 跨網域問題
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
+    async function submitForm() {
+        const idx = document.getElementById('editIdx').value;
+        const data = {
+            action: idx ? "edit" : "add",
+            rowIdx: parseInt(idx),
+            name: document.getElementById('name').value,
+            dept: document.getElementById('dept').value,
+            item: document.getElementById('item').value,
+            amount: document.getElementById('amount').value
+        };
 
-                // 資料傳送後，準備列印
-                alert('資料已成功記錄至試算表！');
-                preparePrint(data);
+        await fetch(scriptUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+        alert('操作成功！');
+        resetForm();
+        setTimeout(fetchRecords, 1500); // 稍微延遲讓 GAS 完成處理後重新抓取
+    }
 
-            } catch (error) {
-                console.error('Error:', error);
-                alert('傳送失敗，請確認網路連線或 GAS 網址。');
-            } finally {
-                btn.innerText = "送出並列印報表";
-                btn.disabled = false;
-            }
-        }
+    function editMode(idx, name, dept, item, amount) {
+        document.getElementById('formTitle').innerText = "編輯紀錄";
+        document.getElementById('editIdx').value = idx;
+        document.getElementById('name').value = name;
+        document.getElementById('dept').value = dept;
+        document.getElementById('item').value = item;
+        document.getElementById('amount').value = amount;
+        document.getElementById('cancelBtn').style.display = "block";
+    }
 
-        function preparePrint(data) {
-            // 將填寫的資料填入列印版面
-            document.getElementById('p-date').innerText = new Date().toLocaleString();
-            document.getElementById('p-name').innerText = data.name;
-            document.getElementById('p-dept').innerText = data.dept;
-            document.getElementById('p-item').innerText = data.item;
-            document.getElementById('p-amount').innerText = data.amount;
+    function resetForm() {
+        document.getElementById('formTitle').innerText = "新申請單";
+        document.getElementById('editIdx').value = "";
+        document.getElementById('cancelBtn').style.display = "none";
+        document.querySelectorAll('input').forEach(i => i.value = "");
+        document.getElementById('amount').value = 1;
+    }
 
-            // 觸發列印
-            window.print();
-        }
-    </script>
+    async function deleteRecord(idx) {
+        if (!confirm("確定要刪除這筆紀錄嗎？")) return;
+        const data = { action: "delete", rowIdx: idx };
+        await fetch(scriptUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+        setTimeout(fetchRecords, 1500);
+    }
+</script>
+
 </body>
 </html>
